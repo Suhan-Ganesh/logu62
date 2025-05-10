@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> 20467eee4fb354fb8dc37b5cc9125ab6a791a467
 import React, { useState } from 'react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

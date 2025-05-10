@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
@@ -16,17 +16,21 @@ const Hero = () => {
               Perfect for university clubs and organizations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                className="bg-gradient-blue hover:bg-logu-dark text-white px-8 py-6 text-lg"
-              >
-                Create an Event
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-logu text-logu hover:bg-logu-light hover:text-white px-8 py-6 text-lg"
-              >
-                Learn More
-              </Button>
+              <Link to="/events">
+                <Button 
+                  className="bg-gradient-blue hover:bg-logu-dark text-white px-8 py-6 text-lg"
+                >
+                  Create an Event
+                </Button>
+              </Link>
+              <Link to="/events">
+                <Button 
+                  variant="outline" 
+                  className="border-logu text-logu hover:bg-logu-light hover:text-white px-8 py-6 text-lg"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="md:w-1/2 mt-12 md:mt-0">

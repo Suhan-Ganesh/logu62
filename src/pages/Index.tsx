@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -8,6 +9,7 @@ import AttendanceList from "@/components/AttendanceList";
 import EventCreator from "@/components/EventCreator";
 import JoinEvent from "@/components/JoinEvent";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   return (
@@ -76,26 +78,17 @@ const Index = () => {
             <p className="text-white text-opacity-90 text-lg mb-8 max-w-2xl mx-auto">
               Start using Logu today and make attendance tracking effortless for your university events.
             </p>
-            <Button className="bg-white text-logu hover:bg-gray-100 px-8 py-6 text-lg">
-              Get Started Now
-            </Button>
+            <Link to="/events">
+              <Button className="bg-white text-logu hover:bg-gray-100 px-8 py-6 text-lg">
+                Get Started Now
+              </Button>
+            </Link>
           </div>
         </section>
       </main>
 
       <Footer />
     </div>
-  );
-};
-
-const Button = ({ className, children, ...props }) => {
-  return (
-    <button 
-      className={`font-medium rounded-lg px-4 py-2 transition-all ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
   );
 };
 

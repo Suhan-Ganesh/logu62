@@ -21,17 +21,21 @@ const Header = () => {
         </nav>
 
         <div className="flex gap-3">
-          <Button 
-            variant="outline"
-            className="hidden md:flex border-logu text-logu hover:bg-logu hover:text-white"
-          >
-            Join Event
-          </Button>
-          <Button 
-            className="bg-gradient-blue hover:bg-logu-dark transition-colors"
-          >
-            Create Event
-          </Button>
+          <Link to="/events">
+            <Button 
+              variant="outline"
+              className="hidden md:flex border-logu text-logu hover:bg-logu hover:text-white"
+            >
+              Join Event
+            </Button>
+          </Link>
+          <Link to="/events">
+            <Button 
+              className="bg-gradient-blue hover:bg-logu-dark transition-colors"
+            >
+              Create Event
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

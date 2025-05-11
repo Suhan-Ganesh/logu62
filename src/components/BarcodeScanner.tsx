@@ -32,9 +32,13 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
       
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
-      
-      // Start capture loop
-      captureFrame();
+      videoRef.current.onloadedmetadata = () => {
+        if (videoRef.current) {
+          videoRef.current.play();
+          // Start capture loop
+          captureFrame();
+        }
+      };
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
@@ -80,6 +84,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
   
   const sendImageToAPI = async (imageData: string) => {
     try {
+      // Make API call to Python backend
       const response = await fetch('http://localhost:5000/scan', {
         method: 'POST',
         headers: {
@@ -99,6 +104,26 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
         if (onScanComplete) {
           onScanComplete(barcodeData);
         }
+        
+        // For demo purposes: Mark attendance in the backend
+        // This would be connected to your Node.js backend
+        /*
+        await fetch('http://localhost:5000/api/attendance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            universityNumber: barcodeData,
+            eventCode: currentEvent.code // This would come from props or context
+          }),
+        });
+        */
+        
+        toast({
+          title: "Student ID Scanned",
+          description: `Successfully scanned ID: ${barcodeData}`,
+        });
       }
     } catch (error) {
       console.error('Error sending image to API:', error);
@@ -120,9 +145,31 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
 
   const handleManualSubmit = () => {
     if (manualId && manualId.trim() !== '') {
+      // Process the manual ID entry
       if (onScanComplete) {
         onScanComplete(manualId);
       }
+      
+      // For demo purposes: Mark attendance in the backend
+      // This would be connected to your Node.js backend
+      /*
+      fetch('http://localhost:5000/api/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          universityNumber: manualId,
+          eventCode: currentEvent.code // This would come from props or context
+        }),
+      });
+      */
+      
+      toast({
+        title: "Student ID Added",
+        description: `Successfully recorded ID: ${manualId}`,
+      });
+      
       setManualId('');
       setShowManualEntry(false);
       setScannedCode(manualId);
@@ -171,9 +218,8 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
           
           <div className="space-y-3">
             <Button 
-              onClick={scannedCode ? resetScanner : startScanning} 
+              onClick={scannedCode ? resetScanner : isScanning ? stopScanning : startScanning} 
               className="w-full bg-gradient-blue hover:bg-logu"
-              disabled={isScanning}
             >
               {isScanning ? "Cancel" : scannedCode ? "Scan Next ID" : "Start Scanning"}
               {!isScanning && !scannedCode && <Camera className="ml-2 h-4 w-4" />}

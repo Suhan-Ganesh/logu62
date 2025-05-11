@@ -1,8 +1,16 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const scrollToAbout = () => {
+    const aboutSection = document.getElementById('about');
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="w-full py-4 px-6 md:px-8 bg-white shadow-sm">
       <div className="container mx-auto flex justify-between items-center">
@@ -16,7 +24,12 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-gray-600 hover:text-logu font-medium">Home</Link>
           <Link to="/events" className="text-gray-600 hover:text-logu font-medium">Events</Link>
-          <Link to="/about" className="text-gray-600 hover:text-logu font-medium">About</Link>
+          <button 
+            onClick={scrollToAbout} 
+            className="text-gray-600 hover:text-logu font-medium bg-transparent border-none cursor-pointer"
+          >
+            About
+          </button>
         </nav>
 
         <div className="flex gap-3">

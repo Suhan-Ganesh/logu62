@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
+import { Barcode, Camera, User } from 'lucide-react';
 
 interface BarcodeScannerProps {
   onScanComplete?: (studentId: string) => void;
@@ -13,20 +14,104 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [manualId, setManualId] = useState('');
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   
-  const startScanning = () => {
-    setIsScanning(true);
-    // In a real app, this would activate the camera
-    // For demo purposes, we'll simulate a scan after 2 seconds
-    setTimeout(() => {
-      const mockStudentId = "U" + Math.floor(100000 + Math.random() * 900000);
-      setScannedCode(mockStudentId);
-      setIsScanning(false);
+  // Start camera streaming
+  const startScanning = async () => {
+    try {
+      setIsScanning(true);
       
-      if (onScanComplete) {
-        onScanComplete(mockStudentId);
+      if (!videoRef.current) return;
+      
+      // Get user media
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      
+      streamRef.current = stream;
+      videoRef.current.srcObject = stream;
+      
+      // Start capture loop
+      captureFrame();
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast({
+        title: "Camera access error",
+        description: "Unable to access camera. Please try manual entry.",
+        variant: "destructive"
+      });
+      setIsScanning(false);
+    }
+  };
+  
+  const captureFrame = () => {
+    if (!isScanning || !videoRef.current || !canvasRef.current) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (!context || video.videoWidth === 0) {
+      // Video not ready yet, try again shortly
+      requestAnimationFrame(captureFrame);
+      return;
+    }
+    
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame on canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert to base64 for sending to API
+    const imageData = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+    
+    // Send to barcode API
+    sendImageToAPI(imageData);
+    
+    // Continue capturing frames
+    setTimeout(() => {
+      if (isScanning) requestAnimationFrame(captureFrame);
+    }, 500); // Scan every 500ms
+  };
+  
+  const sendImageToAPI = async (imageData: string) => {
+    try {
+      const response = await fetch('http://localhost:5000/scan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: imageData }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.barcodes && result.barcodes.length > 0) {
+        // Found a barcode
+        const barcodeData = result.barcodes[0].data;
+        setScannedCode(barcodeData);
+        stopScanning();
+        
+        if (onScanComplete) {
+          onScanComplete(barcodeData);
+        }
       }
-    }, 2000);
+    } catch (error) {
+      console.error('Error sending image to API:', error);
+    }
+  };
+  
+  const stopScanning = () => {
+    setIsScanning(false);
+    
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
   };
   
   const resetScanner = () => {
@@ -40,6 +125,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
       }
       setManualId('');
       setShowManualEntry(false);
+      setScannedCode(manualId);
     }
   };
 
@@ -52,8 +138,20 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
           <div className="h-64 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center mb-6 relative overflow-hidden">
             {isScanning ? (
               <>
-                <div className="absolute w-full h-[2px] bg-logu-light opacity-70 top-0 animate-scanner"></div>
-                <p className="text-logu font-medium animate-pulse">Scanning...</p>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <div className="absolute w-full h-[2px] bg-logu-light opacity-70 top-1/2 animate-scanner"></div>
+                  <canvas ref={canvasRef} style={{ display: 'none' }} />
+                </div>
+                <p className="text-logu font-medium animate-pulse bg-black bg-opacity-50 px-2 py-1 rounded absolute bottom-2 left-2">
+                  Scanning...
+                </p>
               </>
             ) : scannedCode ? (
               <div className="text-center">
@@ -65,10 +163,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
               </div>
             ) : (
               <>
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-300 mb-3">
-                  <rect width="16" height="16" x="4" y="4" rx="2" strokeWidth="2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 9h1m-1 3h1m3-3h1m-1 3h1m2-3h.01m-.01 3h.01" strokeWidth="2" />
-                </svg>
+                <Barcode className="h-16 w-16 text-gray-300 mb-3" />
                 <p className="text-gray-500 font-medium">Ready to scan</p>
               </>
             )}
@@ -80,7 +175,8 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
               className="w-full bg-gradient-blue hover:bg-logu"
               disabled={isScanning}
             >
-              {scannedCode ? "Scan Next ID" : "Start Scanning"}
+              {isScanning ? "Cancel" : scannedCode ? "Scan Next ID" : "Start Scanning"}
+              {!isScanning && !scannedCode && <Camera className="ml-2 h-4 w-4" />}
             </Button>
             
             {showManualEntry ? (
@@ -113,6 +209,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
                 onClick={() => setShowManualEntry(true)}
               >
                 Manual Entry
+                <User className="ml-2 h-4 w-4" />
               </Button>
             )}
           </div>

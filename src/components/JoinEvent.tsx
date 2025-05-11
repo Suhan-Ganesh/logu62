@@ -41,28 +41,55 @@ const JoinEvent = () => {
   const [foundEvent, setFoundEvent] = useState<any>(null);
   const navigate = useNavigate();
   
-  const handleJoinEvent = () => {
+  const handleJoinEvent = async () => {
     if (eventCode.length === 6) {
       setIsJoining(true);
       
-      // Find the event with the matching code
-      const event = initialEvents.find(e => e.code === eventCode);
-      
-      // Simulate API call
-      setTimeout(() => {
-        setIsJoining(false);
+      try {
+        // In a real app, this would check against the backend API
+        /*
+        const response = await fetch(`http://localhost:5000/api/events/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ eventCode }),
+        });
         
-        if (event) {
-          setFoundEvent(event);
-          setJoined(true);
-        } else {
-          toast({
-            title: "Event not found",
-            description: "Please check the event code and try again.",
-            variant: "destructive"
-          });
+        if (!response.ok) {
+          throw new Error('Invalid event code');
         }
-      }, 1500);
+        
+        const event = await response.json();
+        */
+        
+        // For demo, we'll use the mock data
+        setTimeout(() => {
+          // Find the event with the matching code
+          const event = initialEvents.find(e => e.code === eventCode);
+          
+          setIsJoining(false);
+          
+          if (event) {
+            setFoundEvent(event);
+            setJoined(true);
+          } else {
+            toast({
+              title: "Event not found",
+              description: "Please check the event code and try again.",
+              variant: "destructive"
+            });
+          }
+        }, 1000);
+        
+      } catch (error) {
+        setIsJoining(false);
+        toast({
+          title: "Error verifying event",
+          description: "Please try again later.",
+          variant: "destructive"
+        });
+      }
     }
   };
 

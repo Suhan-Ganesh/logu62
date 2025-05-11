@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Download, UserPlus } from "lucide-react";
-import { Link } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 
 // Mock events data (same as in Events.tsx)
@@ -53,6 +52,7 @@ const EventView = () => {
   const [attendees, setAttendees] = useState(initialAttendeesList);
   const [searchTerm, setSearchTerm] = useState('');
   const [showScanner, setShowScanner] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Find the current event from the mock data
   const event = initialEvents.find(e => e.id === eventId) || {
@@ -63,23 +63,119 @@ const EventView = () => {
     attendees: 0
   };
   
-  const handleAddAttendee = (studentId: string) => {
-    // In a real app, this would validate against a database
-    const newAttendee = {
-      id: studentId,
-      name: `Student ${Math.floor(Math.random() * 1000)}`,
-      branch: ['Computer Science', 'Electronics', 'Mechanical'][Math.floor(Math.random() * 3)],
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  // Fetch attendees from backend API
+  useEffect(() => {
+    const fetchAttendees = async () => {
+      try {
+        setIsLoading(true);
+        
+        // For demo, we'll use the mock data
+        // In production, use the API
+        /*
+        const response = await fetch(`http://localhost:5000/api/attendance/${event.code}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Transform backend data to match frontend format
+          const formattedData = data.map(item => ({
+            id: item.university_number,
+            name: item.name,
+            branch: item.branch,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }));
+          
+          setAttendees(formattedData);
+        }
+        */
+        
+        // Using mock data for now
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+        
+      } catch (error) {
+        console.error('Error fetching attendees:', error);
+        toast({
+          title: "Failed to load attendees",
+          description: "Could not connect to the server. Using local data.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+      }
     };
     
-    setAttendees([newAttendee, ...attendees]);
-    toast({
-      title: "Attendee added",
-      description: `${newAttendee.id} has been recorded successfully.`,
-    });
+    fetchAttendees();
+  }, [event.code]);
+  
+  const handleAddAttendee = async (studentId: string) => {
+    try {
+      // In a real app, this would validate against the database
+      /* 
+      const response = await fetch('http://localhost:5000/api/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          universityNumber: studentId,
+          eventCode: event.code
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to mark attendance');
+      }
+      */
+      
+      // For demo purposes, we'll simulate the API call
+      const newAttendee = {
+        id: studentId,
+        name: `Student ${Math.floor(Math.random() * 1000)}`,
+        branch: ['Computer Science', 'Electronics', 'Mechanical'][Math.floor(Math.random() * 3)],
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      // Add to local state
+      setAttendees([newAttendee, ...attendees]);
+      
+      toast({
+        title: "Attendee added",
+        description: `${newAttendee.id} has been recorded successfully.`,
+      });
+      
+    } catch (error) {
+      console.error('Error adding attendee:', error);
+      toast({
+        title: "Failed to add attendee",
+        description: "Could not connect to the server.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleExport = (format: string) => {
+    // In a real app, this would call an API endpoint to generate the export
+    /*
+    fetch(`http://localhost:5000/api/export/${event.code}?format=${format}`)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${event.name}_attendance.${format.toLowerCase()}`;
+        a.click();
+      })
+      .catch(error => {
+        console.error('Error exporting data:', error);
+        toast({
+          title: `Export failed`,
+          description: `Could not export data as ${format}.`,
+          variant: "destructive"
+        });
+      });
+    */
+    
+    // For demo, just show a toast
     toast({
       title: `Export as ${format}`,
       description: `Attendance data has been exported as ${format}.`,
@@ -197,7 +293,13 @@ const EventView = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredAttendees.length > 0 ? (
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={4} className="h-24 text-center">
+                              Loading attendees...
+                            </TableCell>
+                          </TableRow>
+                        ) : filteredAttendees.length > 0 ? (
                           filteredAttendees.map((attendee) => (
                             <TableRow key={attendee.id + attendee.timestamp}>
                               <TableCell className="font-mono">{attendee.id}</TableCell>

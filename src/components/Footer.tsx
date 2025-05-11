@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+//The about is not working in the footer
 
 const Footer = () => {
   return (
@@ -21,7 +22,6 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} Logu. All rights reserved.
             </p>
           </div>
-          
           <div>
             <h4 className="font-bold text-gray-900 mb-4">Quick Links</h4>
             <ul className="space-y-2">
@@ -31,7 +31,7 @@ const Footer = () => {
               <li>
                 <Link to="/events" className="text-gray-600 hover:text-logu">Events</Link>
               </li>
-              <li>
+              <li> 
                 <Link to="/about" className="text-gray-600 hover:text-logu">About</Link>
               </li>
             </ul>

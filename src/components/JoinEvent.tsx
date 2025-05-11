@@ -48,41 +48,70 @@ const JoinEvent = () => {
   const [isJoining, setIsJoining] = useState(false);
   const [joined, setJoined] = useState(false);
   const [foundEvent, setFoundEvent] = useState<Event | null>(null);  // Use Event type here
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   
-  const handleJoinEvent = () => {
+    const handleJoinEvent = async () => {
     if (eventCode.length === 6) {
       setIsJoining(true);
       
-      // Find the event with the matching code
-      const event = initialEvents.find(e => e.code === eventCode);
-      
-      // Simulate API call
-      setTimeout(() => {
-        setIsJoining(false);
+      try {
+        // In a real app, this would check against the backend API
+        // Replace with the following code when backend is integrated:
+        /*
+        const response = await fetch(`http://localhost:5000/api/events/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ eventCode }),
+        });
         
-        if (event) {
-          setFoundEvent(event);
-          setJoined(true);
-        } else {
-          toast({
-            title: "Event not found",
-            description: "Please check the event code and try again.",
-            variant: "destructive"
-          });
+        if (!response.ok) {
+          throw new Error('Invalid event code');
         }
-      }, 1500);
+        
+        const event = await response.json();
+        */
+        
+        // For demo, we'll use the mock data
+        setTimeout(() => {
+          // Find the event with the matching code
+          const event = initialEvents.find(e => e.code === eventCode);
+          
+          setIsJoining(false);
+          
+          if (event) {
+            setFoundEvent(event);
+            setJoined(true);
+          } else {
+            toast({
+              title: "Event not found",
+              description: "Please check the event code and try again.",
+              variant: "destructive"
+            });
+          }
+        }, 1000);
+        
+      } catch (error) {
+        setIsJoining(false);
+        toast({
+          title: "Error verifying event",
+          description: "Please try again later.",
+          variant: "destructive"
+        });
+      }
     }
   };
-
-  const goToEvent = () => {
+   const goToEvent = () => {
     if (foundEvent) {
+      setOpen(false);
       navigate(`/events/${foundEvent.id}`);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="border-logu text-logu hover:bg-logu hover:text-white">
           Join Event
@@ -104,7 +133,7 @@ const JoinEvent = () => {
               </svg>
             </div>
             <h3 className="font-bold text-xl mb-1">{foundEvent?.name}</h3>
-            <p className="text-gray-500 mb-4">You have successfully joined the event!</p>
+             <p className="text-gray-500 mb-4">You have successfully joined the event as a volunteer!</p>
             
             <Button className="w-full bg-gradient-blue" onClick={goToEvent}>
               Go to Event
@@ -112,7 +141,7 @@ const JoinEvent = () => {
           </div>
         ) : (
           <div className="py-4 space-y-4">
-            <p className="text-gray-500">Enter the 6-digit code provided by the event organizer</p>
+            <p className="text-gray-500">Enter the 6-digit code</p>
             <div className="space-y-2">
               <label htmlFor="eventCode" className="text-sm font-medium">Event Code</label>
               <Input 
@@ -129,7 +158,7 @@ const JoinEvent = () => {
               className="w-full bg-gradient-blue" 
               disabled={eventCode.length !== 6 || isJoining}
             >
-              {isJoining ? "Joining..." : "Join Event"}
+               {isJoining ? "Joining..." : "Join as Volunteer"}
             </Button>
           </div>
         )}

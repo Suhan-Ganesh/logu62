@@ -1,22 +1,83 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/use-toast";
+
+// Define the event type
+interface Event {
+  id: string;
+  name: string;
+  date: string;
+  location: string;
+  code: string;
+  attendees: number;
+}
+
+// Mock events data
+const initialEvents: Event[] = [
+  {
+    id: "1",
+    name: "Tech Week Meetup",
+    date: "2025-05-20",
+    location: "Main Hall, Building B",
+    code: "723945",
+    attendees: 42
+  },
+  {
+    id: "2",
+    name: "Robotics Workshop",
+    date: "2025-06-05",
+    location: "Engineering Lab",
+    code: "139872",
+    attendees: 27
+  },
+  {
+    id: "3",
+    name: "Annual Club Gathering",
+    date: "2025-06-15",
+    location: "Student Center",
+    code: "584712",
+    attendees: 89
+  }
+];
 
 const JoinEvent = () => {
   const [eventCode, setEventCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [foundEvent, setFoundEvent] = useState<Event | null>(null);  // Use Event type here
+  const navigate = useNavigate();
   
   const handleJoinEvent = () => {
     if (eventCode.length === 6) {
       setIsJoining(true);
+      
+      // Find the event with the matching code
+      const event = initialEvents.find(e => e.code === eventCode);
+      
       // Simulate API call
       setTimeout(() => {
         setIsJoining(false);
-        setJoined(true);
+        
+        if (event) {
+          setFoundEvent(event);
+          setJoined(true);
+        } else {
+          toast({
+            title: "Event not found",
+            description: "Please check the event code and try again.",
+            variant: "destructive"
+          });
+        }
       }, 1500);
+    }
+  };
+
+  const goToEvent = () => {
+    if (foundEvent) {
+      navigate(`/events/${foundEvent.id}`);
     }
   };
 
@@ -42,10 +103,10 @@ const JoinEvent = () => {
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-1">Tech Week Meetup</h3>
+            <h3 className="font-bold text-xl mb-1">{foundEvent?.name}</h3>
             <p className="text-gray-500 mb-4">You have successfully joined the event!</p>
             
-            <Button className="w-full bg-gradient-blue">
+            <Button className="w-full bg-gradient-blue" onClick={goToEvent}>
               Go to Event
             </Button>
           </div>

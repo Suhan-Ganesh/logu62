@@ -119,49 +119,17 @@ const Events = () => {
                     </div>
                   </CardContent>
                   <CardFooter className="flex gap-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <List className="h-4 w-4 mr-2" />
-                          View Attendees
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>{event.name} - Attendees</DialogTitle>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <p className="text-sm text-gray-500 mb-4">Showing {event.attendees} attendees</p>
-                          <div className="border rounded-md overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-200">
-                              <thead className="bg-gray-50">
-                                <tr>
-                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                                </tr>
-                              </thead>
-                              <tbody className="bg-white divide-y divide-gray-200">
-                                {[...Array(3)].map((_, i) => (
-                                  <tr key={i}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">2023{i+1}000{i+1}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Student {i+1}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">CS</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                        <div className="flex justify-end">
-                          <Button variant="outline" className="mr-2">Export CSV</Button>
-                          <Button>View All</Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    <Button className="w-full bg-gradient-blue">
-                      Scan Attendees
-                    </Button>
+                    <Link to={`/events/${event.id}`} className="w-full">
+                      <Button variant="outline" className="w-full">
+                        <List className="h-4 w-4 mr-2" />
+                        View Attendees
+                      </Button>
+                    </Link>
+                    <Link to={`/events/${event.id}`} className="w-full">
+                      <Button className="w-full bg-gradient-blue">
+                        Scan Attendees
+                      </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}

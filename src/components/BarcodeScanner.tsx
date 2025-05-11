@@ -4,9 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-const BarcodeScanner = () => {
+interface BarcodeScannerProps {
+  onScanComplete?: (studentId: string) => void;
+}
+
+const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
+  const [manualId, setManualId] = useState('');
+  const [showManualEntry, setShowManualEntry] = useState(false);
   
   const startScanning = () => {
     setIsScanning(true);
@@ -16,11 +22,25 @@ const BarcodeScanner = () => {
       const mockStudentId = "U" + Math.floor(100000 + Math.random() * 900000);
       setScannedCode(mockStudentId);
       setIsScanning(false);
+      
+      if (onScanComplete) {
+        onScanComplete(mockStudentId);
+      }
     }, 2000);
   };
   
   const resetScanner = () => {
     setScannedCode(null);
+  };
+
+  const handleManualSubmit = () => {
+    if (manualId && manualId.trim() !== '') {
+      if (onScanComplete) {
+        onScanComplete(manualId);
+      }
+      setManualId('');
+      setShowManualEntry(false);
+    }
   };
 
   return (
@@ -63,24 +83,38 @@ const BarcodeScanner = () => {
               {scannedCode ? "Scan Next ID" : "Start Scanning"}
             </Button>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full border-logu text-logu hover:bg-logu-light hover:text-white">
-                  Manual Entry
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Enter Student ID</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Input placeholder="University ID Number" />
-                  </div>
-                  <Button className="w-full bg-gradient-blue">Submit</Button>
+            {showManualEntry ? (
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="University ID Number" 
+                    value={manualId}
+                    onChange={(e) => setManualId(e.target.value)}
+                  />
+                  <Button 
+                    className="bg-gradient-blue shrink-0" 
+                    onClick={handleManualSubmit}
+                  >
+                    Submit
+                  </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+                <Button 
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => setShowManualEntry(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="w-full border-logu text-logu hover:bg-logu-light hover:text-white"
+                onClick={() => setShowManualEntry(true)}
+              >
+                Manual Entry
+              </Button>
+            )}
           </div>
         </div>
       </div>

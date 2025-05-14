@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +35,10 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
       
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
+<<<<<<< HEAD
 
+=======
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
       videoRef.current.onloadedmetadata = () => {
         if (videoRef.current) {
           videoRef.current.play();
@@ -104,7 +111,11 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
         if (onScanComplete) {
           onScanComplete(barcodeData);
         }
+<<<<<<< HEAD
                 
+=======
+        
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
         // For demo purposes: Mark attendance in the backend
         // This would be connected to your Node.js backend
         /*
@@ -149,7 +160,11 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
       if (onScanComplete) {
         onScanComplete(manualId);
       }
+<<<<<<< HEAD
             
+=======
+      
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
       // For demo purposes: Mark attendance in the backend
       // This would be connected to your Node.js backend
       /*
@@ -218,7 +233,11 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScanComplete }) => {
           
           <div className="space-y-3">
             <Button 
+<<<<<<< HEAD
               onClick={scannedCode ? resetScanner : isScanning ? stopScanning : startScanning}  
+=======
+              onClick={scannedCode ? resetScanner : isScanning ? stopScanning : startScanning} 
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
               className="w-full bg-gradient-blue hover:bg-logu"
             >
               {isScanning ? "Cancel" : scannedCode ? "Scan Next ID" : "Start Scanning"}

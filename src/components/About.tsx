@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
 import React from 'react';
 import { Users } from 'lucide-react';
 

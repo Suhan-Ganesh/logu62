@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 
+<<<<<<< HEAD
 // Define the event type
 interface Event {
   id: string;
@@ -17,6 +18,10 @@ interface Event {
 
 // Mock events data
 const initialEvents: Event[] = [
+=======
+// Mock events data
+const initialEvents = [
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
   {
     id: "1",
     name: "Tech Week Meetup",
@@ -47,11 +52,19 @@ const JoinEvent = () => {
   const [eventCode, setEventCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+<<<<<<< HEAD
   const [foundEvent, setFoundEvent] = useState<Event | null>(null);  // Use Event type here
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   
     const handleJoinEvent = async () => {
+=======
+  const [foundEvent, setFoundEvent] = useState<any>(null);
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  const handleJoinEvent = async () => {
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
     if (eventCode.length === 6) {
       setIsJoining(true);
       
@@ -103,7 +116,12 @@ const JoinEvent = () => {
       }
     }
   };
+<<<<<<< HEAD
    const goToEvent = () => {
+=======
+
+  const goToEvent = () => {
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
     if (foundEvent) {
       setOpen(false);
       navigate(`/events/${foundEvent.id}`);
@@ -133,7 +151,11 @@ const JoinEvent = () => {
               </svg>
             </div>
             <h3 className="font-bold text-xl mb-1">{foundEvent?.name}</h3>
+<<<<<<< HEAD
              <p className="text-gray-500 mb-4">You have successfully joined the event as a volunteer!</p>
+=======
+            <p className="text-gray-500 mb-4">You have successfully joined the event as a volunteer!</p>
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
             
             <Button className="w-full bg-gradient-blue" onClick={goToEvent}>
               Go to Event
@@ -141,7 +163,11 @@ const JoinEvent = () => {
           </div>
         ) : (
           <div className="py-4 space-y-4">
+<<<<<<< HEAD
             <p className="text-gray-500">Enter the 6-digit code</p>
+=======
+            <p className="text-gray-500">Enter the 6-digit code provided by the event organizer to join as a volunteer</p>
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
             <div className="space-y-2">
               <label htmlFor="eventCode" className="text-sm font-medium">Event Code</label>
               <Input 
@@ -158,7 +184,11 @@ const JoinEvent = () => {
               className="w-full bg-gradient-blue" 
               disabled={eventCode.length !== 6 || isJoining}
             >
+<<<<<<< HEAD
                {isJoining ? "Joining..." : "Join as Volunteer"}
+=======
+              {isJoining ? "Joining..." : "Join as Volunteer"}
+>>>>>>> e812c0638777cbf0fa00543cfa28be8a8905caa3
             </Button>
           </div>
         )}
